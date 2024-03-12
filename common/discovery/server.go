@@ -1,6 +1,11 @@
 package discovery
 
-import "fmt"
+import (
+	"encoding/json"
+	"errors"
+	"fmt"
+	"strings"
+)
 
 type Server struct {
 	Name    string `json:"name"`
@@ -17,4 +22,31 @@ func (s Server) BuildRegisterKey() string {
 	}
 	// name/Version
 	return fmt.Sprint("/%s/%s/%s", s.Name, s.Version, s.Addr)
+}
+
+func ParseValue(value []byte) (Server, error) {
+	var server Server
+	if err := json.Unmarshal(value, &server); err != nil {
+		return server, err
+	}
+	return server, nil
+}
+
+func ParseKey(key string) (Server, error) {
+	// user/v1/127.0.0.1:8080
+	// user/127.0.0.1:8080
+	split := strings.Split(key, "/")
+	if len(split) == 2 {
+		return Server{
+			Name: split[0],
+			Addr: split[1],
+		}, nil
+	} else if len(split) == 3 {
+		return Server{
+			Name:    split[0],
+			Addr:    split[2],
+			Version: split[1],
+		}, nil
+	}
+	return Server{}, errors.New("invalid key")
 }

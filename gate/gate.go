@@ -1,10 +1,14 @@
-package main
+package gate
 
 import (
 	"common/config"
 	"common/metrics"
+	"context"
 	"flag"
 	"fmt"
+	"gate/app"
+	"log"
+	"os"
 )
 
 var configFile = flag.String("config", "application.yml", "config file")
@@ -20,11 +24,10 @@ func main() {
 			panic(err)
 		}
 	}()
-	select {}
 	// 啓動 grpc 服務器
-	//err := app.Run(context.Background())
-	//if err != nil {
-	//	log.Println(err)
-	//	os.Exit(-1)
-	//}
+	err := app.Run(context.Background())
+	if err != nil {
+		log.Println(err)
+		os.Exit(-1)
+	}
 }

@@ -5,6 +5,7 @@ import (
 	"common/discovery"
 	"common/logs"
 	"context"
+	"core/repo"
 	"fmt"
 	"google.golang.org/grpc"
 	"net"
@@ -12,6 +13,8 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+	"user/internal/service"
+	"user/pb"
 )
 
 // Run 启动 grpc http log db
@@ -22,8 +25,10 @@ func Run(ctx context.Context) error {
 	register := discovery.NewRegister()
 	// 启动 grpc
 	server := grpc.NewServer()
-	go func() {
+	// todo 初始化 数据库管理
+	manager := repo.NewManager()
 
+	go func() {
 		listen, err := net.Listen("tcp", config.Conf.Grpc.Addr)
 		if err != nil {
 			logs.Fatal("user grpc run listen err: %v", err)
@@ -33,8 +38,8 @@ func Run(ctx context.Context) error {
 		if err != nil {
 			logs.Fatal("user grpc register err: %v", err)
 		}
-		// todo 初始化 数据库管理
 
+		pb.RegisterUserServiceServer(server, service.NewAccountService(manager))
 		// 阻塞操作
 		err = server.Serve(listen)
 		if err != nil {
@@ -45,6 +50,7 @@ func Run(ctx context.Context) error {
 	stop := func() {
 		server.Stop()
 		register.Close()
+		manager.Close()
 		// 等待时间
 		time.Sleep(5 * time.Second)
 		fmt.Println("stop user finished")
