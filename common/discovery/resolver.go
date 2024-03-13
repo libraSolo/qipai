@@ -36,7 +36,7 @@ func (r Resolver) Build(target resolver.Target, cc resolver.ClientConn, opts res
 	}
 	r.closeCh = make(chan struct{})
 	// 2. 根据 key 获取 value
-	r.key = target.URL.Host
+	r.key = target.URL.Path
 	if err := r.sync(); err != nil {
 		return nil, err
 	}
@@ -67,7 +67,7 @@ func (r Resolver) sync() error {
 	for _, v := range get.Kvs {
 		server, err := ParseValue(v.Value)
 		if err != nil {
-			logs.Error("grpc client parse etcd valuef ailed, name = %s, err:%v", r.key, err)
+			logs.Warn("grpc client parse etcd value failed, name = %s, err:%v", r.key, err)
 			continue
 		}
 		flag = false
@@ -77,8 +77,11 @@ func (r Resolver) sync() error {
 			Attributes: attributes.New("weight", server.Weight),
 		})
 	}
+	if len(r.srcAddrList) == 0 {
+		return nil
+	}
 	if flag {
-		logs.Error("grpc client parse etcd value failed, name = %s, err:%v", r.key, err)
+		logs.Error("grpc client parse etcd value failed, name = %s", r.key)
 		return err
 	}
 	err = r.cc.UpdateState(resolver.State{

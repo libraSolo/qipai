@@ -1,4 +1,4 @@
-package gate
+package main
 
 import (
 	"common/config"

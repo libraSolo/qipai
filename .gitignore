@@ -1,3 +1,5 @@
 .idea/.gitignore
 .idea/modules.xml
 .idea/qipai.iml
+docker/mongo/
+docker/etcd/

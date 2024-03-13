@@ -23,6 +23,7 @@ func (u *UserHandler) Register(ctx *gin.Context) {
 		SmsCode:       "",
 	})
 	if err != nil {
+		println(err)
 		// deal error
 	}
 	uid := res.Uid

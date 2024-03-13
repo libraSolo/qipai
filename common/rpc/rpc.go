@@ -35,7 +35,7 @@ func initClient(name string, loadBalance bool, client interface{}) {
 	if loadBalance {
 		opts = append(opts, grpc.WithDefaultServiceConfig(fmt.Sprintf(`{"LoadBalancingPolicy": "%s"}`, "round_robin")))
 	}
-	conn, err := grpc.DialContext(context.TODO(), addr)
+	conn, err := grpc.DialContext(context.TODO(), addr, opts...)
 	if err != nil {
 		logs.Fatal("rpc connect etcd err:%v", err)
 	}

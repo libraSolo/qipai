@@ -31,8 +31,8 @@ services:
     ports:
       - 27018:27017
     volumes:
-      - ${MONGO_DIR}/db:/data/db # 挂载数据目录
-      - ${MONGO_DIR}/log:/var/log/mongodb  # 挂载日志目录
+      - ./mongo/db:/data/db # 挂载数据目录
+      - ./mongo/log:/var/log/mongodb  # 挂载日志目录
     privileged: true  # 设置容器的权限为root
     environment:
       MONGO_INITDB_ROOT_USERNAME: root  # 账号

@@ -15,9 +15,9 @@ etcd:
     ttl: 10
 db:
   mongo:
-    url: mongodb://localhost:27017
-    userName:
-    password:
+    url: mongodb://127.0.0.1:27018
+    userName: root
+    password: root123456
     minPoolSize: 10
     maxPoolSize: 100
     db: qipai

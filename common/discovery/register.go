@@ -118,19 +118,19 @@ func (r *Register) watcher() {
 			}
 			// 租约撤销
 			if _, err := r.etcdClient.Revoke(context.Background(), r.leaseID); err != nil {
-				logs.Error("close and Revoke lease failed, err%v", err)
+				logs.Error("close and Revoke lease failed, err:%v", err)
 			}
 			logs.Info("unregister etcd...")
 		case res := <-r.keepAliveCh:
 			if res != nil {
 				if err := r.register(); err != nil {
-					logs.Error("keepAliveCh register failed, err%v", err)
+					logs.Error("keepAliveCh register failed, err:%v", err)
 				}
 			}
 		case <-ticker.C:
 			if r.keepAliveCh == nil {
 				if err := r.register(); err != nil {
-					logs.Error("ticker register failed, err%v", err)
+					logs.Error("ticker register failed, err:%v", err)
 				}
 			}
 		}

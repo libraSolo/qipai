@@ -3,8 +3,12 @@ package main
 import (
 	"common/config"
 	"common/metrics"
+	"context"
 	"flag"
 	"fmt"
+	"log"
+	"os"
+	"user/app"
 )
 
 var configFile = flag.String("config", "application.yml", "config file")
@@ -20,11 +24,11 @@ func main() {
 			panic(err)
 		}
 	}()
-	select {}
-	// 啓動 grpc 服務器
-	//err := app.Run(context.Background())
-	//if err != nil {
-	//	log.Println(err)
-	//	os.Exit(-1)
-	//}
+
+	//啓動 grpc 服務器
+	err := app.Run(context.Background())
+	if err != nil {
+		log.Println(err)
+		os.Exit(-1)
+	}
 }

@@ -6,7 +6,6 @@ import (
 	"common/logs"
 	"context"
 	"core/repo"
-	"fmt"
 	"google.golang.org/grpc"
 	"net"
 	"os"
@@ -53,7 +52,7 @@ func Run(ctx context.Context) error {
 		manager.Close()
 		// 等待时间
 		time.Sleep(5 * time.Second)
-		fmt.Println("stop user finished")
+		logs.Info("stop user finished")
 	}
 
 	c := make(chan os.Signal, 1)
