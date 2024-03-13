@@ -18,10 +18,10 @@ type Server struct {
 func (s Server) BuildRegisterKey() string {
 	// name
 	if 0 == len(s.Version) {
-		return fmt.Sprint("/%s/%s", s.Name, s.Addr)
+		return fmt.Sprintf("/%s/%s", s.Name, s.Addr)
 	}
 	// name/Version
-	return fmt.Sprint("/%s/%s/%s", s.Name, s.Version, s.Addr)
+	return fmt.Sprintf("/%s/%s/%s", s.Name, s.Version, s.Addr)
 }
 
 func ParseValue(value []byte) (Server, error) {
