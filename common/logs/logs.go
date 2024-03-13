@@ -25,7 +25,7 @@ func Fatal(format string, v ...any) {
 	if len(v) == 0 {
 		logger.Fatal(format)
 	} else {
-		logger.Fatalf(format)
+		logger.Fatalf(format, v...)
 	}
 }
 
@@ -33,7 +33,7 @@ func Info(format string, v ...any) {
 	if len(v) == 0 {
 		logger.Info(format)
 	} else {
-		logger.Infof(format)
+		logger.Infof(format, v...)
 	}
 }
 
@@ -41,7 +41,7 @@ func Debug(format string, v ...any) {
 	if len(v) == 0 {
 		logger.Debug(format)
 	} else {
-		logger.Debugf(format)
+		logger.Debugf(format, v...)
 	}
 }
 
@@ -49,7 +49,7 @@ func Warn(format string, v ...any) {
 	if len(v) == 0 {
 		logger.Warn(format)
 	} else {
-		logger.Warnf(format)
+		logger.Warnf(format, v...)
 	}
 }
 
@@ -57,6 +57,6 @@ func Error(format string, v ...any) {
 	if len(v) == 0 {
 		logger.Error(format)
 	} else {
-		logger.Errorf(format)
+		logger.Errorf(format, v...)
 	}
 }
