@@ -78,6 +78,7 @@ func (r Resolver) sync() error {
 		})
 	}
 	if len(r.srcAddrList) == 0 {
+		logs.Error("grpc client no service find")
 		return nil
 	}
 	if flag {

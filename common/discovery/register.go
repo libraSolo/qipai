@@ -66,12 +66,12 @@ func (r *Register) register() error {
 		return err
 	}
 	// 2.心跳监测
-	if r.keepAliveCh, err = r.keepAlive(ctx); err != nil {
+	if r.keepAliveCh, err = r.keepAlive(); err != nil {
 		return err
 	}
 	// 3.绑定租约
 	data, _ := json.Marshal(r.info)
-	return r.blindLease(ctx, r.info.BuildRegisterKey(), string(data))
+	return r.bindLease(ctx, r.info.BuildRegisterKey(), string(data))
 }
 
 // 创建租约 ttl 秒
@@ -86,19 +86,20 @@ func (r *Register) createLease(ctx context.Context, ttl int64) error {
 }
 
 // 绑定租约
-func (r *Register) blindLease(ctx context.Context, key, value string) error {
+func (r *Register) bindLease(ctx context.Context, key, value string) error {
 	// put
 	_, err := r.etcdClient.Put(ctx, key, value, clientv3.WithLease(r.leaseID))
 	if err != nil {
 		logs.Error("error blind lease failed: %v", err)
 		return err
 	}
+	logs.Info("register service succeeded key: %v", key)
 	return nil
 }
 
 // 心跳监测
-func (r *Register) keepAlive(ctx context.Context) (<-chan *clientv3.LeaseKeepAliveResponse, error) {
-	keepAliveResponses, err := r.etcdClient.KeepAlive(ctx, r.leaseID)
+func (r *Register) keepAlive() (<-chan *clientv3.LeaseKeepAliveResponse, error) {
+	keepAliveResponses, err := r.etcdClient.KeepAlive(context.Background(), r.leaseID)
 	if err != nil {
 		logs.Error("error blind lease failed: %v", err)
 		return keepAliveResponses, err
@@ -120,13 +121,17 @@ func (r *Register) watcher() {
 			if _, err := r.etcdClient.Revoke(context.Background(), r.leaseID); err != nil {
 				logs.Error("close and Revoke lease failed, err:%v", err)
 			}
-			logs.Info("unregister etcd...")
-		case res := <-r.keepAliveCh:
-			if res != nil {
-				if err := r.register(); err != nil {
-					logs.Error("keepAliveCh register failed, err:%v", err)
-				}
+			if r.etcdClient != nil {
+				r.etcdClient.Close()
 			}
+			logs.Info("unregister etcd...")
+		case <-r.keepAliveCh:
+			//logs.Info("keep alive %v", res)
+			//if res != nil {
+			//	if err := r.register(); err != nil {
+			//		logs.Error("keepAliveCh register failed, err:%v", err)
+			//	}
+			//}
 		case <-ticker.C:
 			if r.keepAliveCh == nil {
 				if err := r.register(); err != nil {

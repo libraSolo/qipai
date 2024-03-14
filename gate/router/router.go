@@ -3,6 +3,7 @@ package router
 import (
 	"common/config"
 	"common/rpc"
+	"gate/auth"
 	handler "gate/handle"
 	"github.com/gin-gonic/gin"
 )
@@ -18,6 +19,8 @@ func RegisterRouter() *gin.Engine {
 	rpc.Init()
 
 	r := gin.Default()
+	// 跨域
+	r.Use(auth.Cors())
 	userHandler := handler.NewUserHandler()
 	r.POST("/register", userHandler.Register)
 	return r
