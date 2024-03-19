@@ -49,15 +49,15 @@ func (s *AccountService) wxRegister(req *pb.RegisterParams) (*entity.Account, *e
 		WxAccount:  req.Account,
 		CreateTime: time.Now(),
 	}
-	exists, err := s.accountDao.Exists(context.TODO(), account)
-	if err != nil {
-		logs.Error("account register redis error err:%v", err)
-		return account, biz.SqlError
-	}
-	if exists {
-		logs.Error("account register redis error err:%v", err)
-		return account, biz.InvalidUsers
-	}
+	//exists, err := s.accountDao.Exists(context.TODO(), account)
+	//if err != nil {
+	//	logs.Error("account register exist err:%v", err)
+	//	return account, biz.SqlError
+	//}
+	//if exists {
+	//	logs.Error("account register exist")
+	//	return account, biz.InvalidUsers
+	//}
 	// 2.生成数字作为用户的唯一id redis 自增
 	uid, err := s.redisDao.NextAccountID()
 	if err != nil {

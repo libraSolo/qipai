@@ -12,6 +12,19 @@ type Result struct {
 	Msg  any `json:"msg"`
 }
 
+func F(err *errorCode.Error) Result {
+	return Result{
+		Code: err.Code,
+	}
+}
+
+func S(data any) Result {
+	return Result{
+		Code: biz.OK,
+		Msg:  data,
+	}
+}
+
 func Fail(ctx *gin.Context, err *errorCode.Error) {
 	ctx.JSON(http.StatusOK, Result{
 		Code: err.Code,

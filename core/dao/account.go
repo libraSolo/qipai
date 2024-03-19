@@ -10,6 +10,12 @@ type AccountDao struct {
 	repo *repo.Manager
 }
 
+func NewAccountDao(m *repo.Manager) *AccountDao {
+	return &AccountDao{
+		repo: m,
+	}
+}
+
 func (d AccountDao) SaveAccount(ctx context.Context, account *entity.Account) error {
 	table := d.repo.Mongo.DB.Collection("account")
 	_, err := table.InsertOne(ctx, account)
@@ -26,10 +32,4 @@ func (d AccountDao) Exists(ctx context.Context, account *entity.Account) (bool, 
 		return false, err
 	}
 	return true, nil
-}
-
-func NewAccountDao(m *repo.Manager) *AccountDao {
-	return &AccountDao{
-		repo: m,
-	}
 }
