@@ -10,6 +10,7 @@ import (
 	"core/repo"
 	"fmt"
 	"framework/game"
+	hallReq "hall/models/request"
 	"time"
 )
 
@@ -23,7 +24,7 @@ func NewUserService(r *repo.Manager) *UserService {
 	}
 }
 
-func (s UserService) FindUserByUid(ctx context.Context, uid string, info request.UserInfo) (*entity.User, error) {
+func (s *UserService) FindUserByUid(ctx context.Context, uid string, info request.UserInfo) (*entity.User, error) {
 	// 查询 mongo 存在则返回，没有则新增
 	user, err := s.userDao.FindUserByUid(ctx, uid)
 	if err != nil {
@@ -47,4 +48,18 @@ func (s UserService) FindUserByUid(ctx context.Context, uid string, info request
 		}
 	}
 	return user, nil
+}
+
+func (s *UserService) UpdateUserAddressByUid(uid string, req hallReq.UpdateUserAddressReq) error {
+	user := &entity.User{
+		Uid:      uid,
+		Address:  req.Address,
+		Location: req.Location,
+	}
+	err := s.userDao.UpdateUserAddressByUid(context.TODO(), user)
+	if err != nil {
+		logs.Error("update user err:%v", err)
+		return err
+	}
+	return nil
 }

@@ -1,6 +1,6 @@
 httpPort: 13000
-appName: connector
-MetricPort: 5856
+appName: hall
+MetricPort: 5857
 log:
   level: DEBUG
 db:

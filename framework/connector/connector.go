@@ -5,12 +5,14 @@ import (
 	"fmt"
 	"framework/game"
 	"framework/net"
+	"framework/remote"
 )
 
 type Connector struct {
 	isRunning bool
 	wsManager *net.Manager
 	handlers  net.LogicHandler
+	remoteCli remote.Client
 }
 
 func Default() *Connector {
@@ -24,7 +26,10 @@ func (c *Connector) Run(serverId string) {
 	if !c.isRunning {
 		// 启动 ws 和 nats
 		c.wsManager = net.NewManager()
+		c.remoteCli = remote.NewNatsClient(serverId, c.wsManager.RemoteReadChan)
+		c.remoteCli.Run()
 		c.wsManager.ConnectorHandlers = c.handlers
+		c.wsManager.RemoteCli = c.remoteCli
 		c.serve(serverId)
 	}
 }

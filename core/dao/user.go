@@ -19,7 +19,7 @@ func NewUserDao(m *repo.Manager) *UserDao {
 	}
 }
 
-func (d UserDao) FindUserByUid(ctx context.Context, uid string) (*entity.User, error) {
+func (d *UserDao) FindUserByUid(ctx context.Context, uid string) (*entity.User, error) {
 	db := d.repo.Mongo.DB.Collection("user")
 	result := db.FindOne(ctx, bson.D{{"uid", uid}})
 	user := new(entity.User)
@@ -33,8 +33,17 @@ func (d UserDao) FindUserByUid(ctx context.Context, uid string) (*entity.User, e
 	return user, nil
 }
 
-func (d UserDao) Insert(ctx context.Context, user *entity.User) error {
+func (d *UserDao) Insert(ctx context.Context, user *entity.User) error {
 	db := d.repo.Mongo.DB.Collection("user")
 	_, err := db.InsertOne(ctx, user)
+	return err
+}
+
+func (d *UserDao) UpdateUserAddressByUid(ctx context.Context, user *entity.User) error {
+	db := d.repo.Mongo.DB.Collection("user")
+	_, err := db.UpdateOne(ctx, bson.M{"uid": user.Uid}, bson.M{"$set": bson.M{
+		"address":  user.Address,
+		"location": user.Location,
+	}})
 	return err
 }

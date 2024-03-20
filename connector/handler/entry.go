@@ -39,6 +39,7 @@ func (h *EntryHandler) Entry(session *net.Session, body []byte) (any, error) {
 		logs.Error("parse token error: %v", err)
 		return common.F(biz.TokenInfoError), nil
 	}
+	session.Uid = uid
 	// 根据 uid 在 mongo 中查找用户
 	user, err := h.userService.FindUserByUid(context.TODO(), uid, req.UserInfo)
 	if err != nil {

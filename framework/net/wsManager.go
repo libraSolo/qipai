@@ -7,10 +7,13 @@ import (
 	"fmt"
 	"framework/game"
 	"framework/protocol"
+	"framework/remote"
 	"github.com/gorilla/websocket"
+	"golang.org/x/exp/rand"
 	"net/http"
 	"strings"
 	"sync"
+	"time"
 )
 
 var (
@@ -37,10 +40,13 @@ type Manager struct {
 	ClientReadChan     chan *MsgPack
 	handles            map[protocol.PackageType]EventHandler
 	ConnectorHandlers  LogicHandler
+	RemoteReadChan     chan []byte
+	RemoteCli          remote.Client
 }
 
 func (m *Manager) Run(addr string) {
-	go m.ClientReadChanHandler()
+	go m.clientReadChanHandler()
+	go m.remoteReadChanHandler()
 	http.HandleFunc("/", m.serverWS)
 
 	// 设置不同的消息处理器
@@ -82,7 +88,7 @@ func (m *Manager) removeClient(wsC *WsConnection) {
 	}
 }
 
-func (m *Manager) ClientReadChanHandler() {
+func (m *Manager) clientReadChanHandler() {
 	for {
 		select {
 		case body, ok := <-m.ClientReadChan:
@@ -104,7 +110,15 @@ func (m *Manager) decodeClientPack(body *MsgPack) {
 		logs.Error("no route found err: %v", err)
 		return
 	}
+}
 
+func (m *Manager) remoteReadChanHandler() {
+	for {
+		select {
+		case msg := <-m.RemoteReadChan:
+			logs.Info("sub nats msg received:%v", string(msg))
+		}
+	}
 }
 
 func (m *Manager) Close() {
@@ -201,6 +215,27 @@ func (m *Manager) MessageHandler(packet *protocol.Packet, c Connection) error {
 		}
 	} else {
 		// nats 远端调用
+		dst, err := m.selectDst(serverType)
+		if err != nil {
+			logs.Error("remote select dst err")
+			return err
+		}
+
+		msg := remote.Msg{
+			Cid:         c.GetSession().ClientId,
+			Uid:         c.GetSession().Uid,
+			Src:         m.ServerId,
+			Dst:         dst,
+			Router:      handlerMethod,
+			Body:        message,
+			SessionData: c.GetSession().data,
+		}
+		data, _ := json.Marshal(msg)
+		err = m.RemoteCli.SendMsg(dst, data)
+		if err != nil {
+			logs.Error("remote send msg err %v", err)
+			return err
+		}
 	}
 	return nil
 }
@@ -211,10 +246,22 @@ func (m *Manager) HandKickHandler(packet *protocol.Packet, c Connection) error {
 	return nil
 }
 
+func (m *Manager) selectDst(serverType string) (string, error) {
+	configs, ok := game.Conf.ServersConf.TypeServer[serverType]
+	if !ok {
+		return "", errors.New("no server")
+	}
+	// 负载均衡 || 随机
+	rand.Seed(uint64(time.Now().Unix()))
+	index := rand.Intn(len(configs))
+	return configs[index].ID, nil
+}
+
 func NewManager() *Manager {
 	return &Manager{
 		ClientReadChan: make(chan *MsgPack, 1024),
 		clients:        make(map[string]*WsConnection),
 		handles:        make(map[protocol.PackageType]EventHandler),
+		RemoteReadChan: make(chan []byte, 1024),
 	}
 }
