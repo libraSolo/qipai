@@ -41,9 +41,12 @@ func (h *EntryHandler) Entry(session *net.Session, body []byte) (any, error) {
 	}
 	session.Uid = uid
 	// 根据 uid 在 mongo 中查找用户
-	user, err := h.userService.FindUserByUid(context.TODO(), uid, req.UserInfo)
-	if err != nil {
-		return common.F(biz.SqlError), nil
+	user, err := h.userService.FindUserByUid(context.TODO(), uid)
+	if err != nil || user == nil {
+		user, err = h.userService.CreateUserByUid(context.TODO(), uid, req.UserInfo)
+		if err != nil {
+			return common.F(biz.SqlError), nil
+		}
 	}
 	return common.S(map[string]any{
 		"userInfo": user,

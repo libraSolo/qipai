@@ -2,6 +2,7 @@ package net
 
 import (
 	"common/logs"
+	"common/utils"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -42,11 +43,23 @@ type Manager struct {
 	ConnectorHandlers  LogicHandler
 	RemoteReadChan     chan []byte
 	RemoteCli          remote.Client
+	RemotePushChan     chan *remote.Msg
+}
+
+func NewManager() *Manager {
+	return &Manager{
+		ClientReadChan: make(chan *MsgPack, 1024),
+		clients:        make(map[string]*WsConnection),
+		handles:        make(map[protocol.PackageType]EventHandler),
+		RemoteReadChan: make(chan []byte, 1024),
+		RemotePushChan: make(chan *remote.Msg, 1024),
+	}
 }
 
 func (m *Manager) Run(addr string) {
 	go m.clientReadChanHandler()
 	go m.remoteReadChanHandler()
+	go m.remotePushChanHandler()
 	http.HandleFunc("/", m.serverWS)
 
 	// 设置不同的消息处理器
@@ -115,8 +128,33 @@ func (m *Manager) decodeClientPack(body *MsgPack) {
 func (m *Manager) remoteReadChanHandler() {
 	for {
 		select {
-		case msg := <-m.RemoteReadChan:
-			logs.Info("sub nats msg received:%v", string(msg))
+		case body, ok := <-m.RemoteReadChan:
+			//logs.Info("sub nats msg received:%v", string(msg))
+			if ok {
+				m.decodeNatsPack(body)
+			}
+		}
+	}
+}
+
+func (m *Manager) decodeNatsPack(body []byte) {
+	var msg remote.Msg
+	err := json.Unmarshal(body, &msg)
+	if err != nil {
+		logs.Error("decode nats msg err: %v", err)
+		return
+	}
+	if msg.Type == remote.SessionType {
+		// 特殊处理 session类型存在 connection中,不推送到客户端
+	}
+	if msg.Body != nil {
+		if msg.Body.Type == protocol.Request {
+			// 给客户端回信息: res
+			msg.Body.Type = protocol.Response
+			m.Response(&msg)
+		}
+		if msg.Body.Type == protocol.Push {
+			m.RemotePushChan <- &msg
 		}
 	}
 }
@@ -257,11 +295,49 @@ func (m *Manager) selectDst(serverType string) (string, error) {
 	return configs[index].ID, nil
 }
 
-func NewManager() *Manager {
-	return &Manager{
-		ClientReadChan: make(chan *MsgPack, 1024),
-		clients:        make(map[string]*WsConnection),
-		handles:        make(map[protocol.PackageType]EventHandler),
-		RemoteReadChan: make(chan []byte, 1024),
+func (m *Manager) remotePushChanHandler() {
+	for {
+		select {
+		case body, ok := <-m.RemotePushChan:
+			if ok {
+				if body.Body.Type == protocol.Push {
+					m.Response(body)
+				}
+			}
+		}
+	}
+}
+
+func (m *Manager) Response(msg *remote.Msg) {
+	connection, ok := m.clients[msg.Cid]
+	if !ok {
+		logs.Info("%s client down, uid=%s", msg.Cid)
+		return
+	}
+	encode, err := protocol.MessageEncode(msg.Body)
+	if err != nil {
+		logs.Error("res message encode error:%v", err)
+		return
+	}
+	res, err := protocol.Encode(protocol.Data, encode)
+	if err != nil {
+		logs.Error("res message encode error:%v", err)
+		return
+	}
+	if msg.Body.Type == protocol.Push {
+		for _, connection = range m.clients {
+			if utils.Contains(msg.PushUser, connection.GetSession().Uid) {
+				err := connection.SendMessage(res)
+				if err != nil {
+					logs.Error("res message send error:%v", err)
+					continue
+				}
+			}
+		}
+		return
+	}
+	err = connection.SendMessage(res)
+	if err != nil {
+		logs.Error("res message send error:%v", err)
 	}
 }
