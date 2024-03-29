@@ -24,7 +24,7 @@ func NewUnionHandler(r *repo.Manager, manager *logic.UnionManager) *UnionHandler
 	}
 }
 
-func (h UnionHandler) CreateRoom(session *remote.Session, msg []byte) any {
+func (h *UnionHandler) CreateRoom(session *remote.Session, msg []byte) any {
 	// 判断 uid 是否合法
 	uid := session.GetUid()
 	if len(uid) <= 0 {

@@ -146,6 +146,7 @@ func (m *Manager) decodeNatsPack(body []byte) {
 	}
 	if msg.Type == remote.SessionType {
 		// 特殊处理 session类型存在 connection中,不推送到客户端
+		m.setSessionData(msg)
 	}
 	if msg.Body != nil {
 		if msg.Body.Type == protocol.Request {
@@ -258,7 +259,6 @@ func (m *Manager) MessageHandler(packet *protocol.Packet, c Connection) error {
 			logs.Error("remote select dst err")
 			return err
 		}
-
 		msg := remote.Msg{
 			Cid:         c.GetSession().ClientId,
 			Uid:         c.GetSession().Uid,
@@ -340,4 +340,14 @@ func (m *Manager) Response(msg *remote.Msg) {
 	if err != nil {
 		logs.Error("res message send error:%v", err)
 	}
+}
+
+func (m *Manager) setSessionData(msg remote.Msg) {
+	m.RLock()
+	defer m.RUnlock()
+	connection, ok := m.clients[msg.Cid]
+	if ok {
+		connection.GetSession().SetData(msg.Uid, msg.SessionData)
+	}
+	return
 }

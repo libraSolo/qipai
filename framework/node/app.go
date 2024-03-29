@@ -45,6 +45,7 @@ func (a *App) readChanMsg() {
 				continue
 			}
 			session := remote.NewSession(a.remoteCli, &remoteMsg)
+			session.SetData(remoteMsg.SessionData)
 			// 路由分发
 			router := remoteMsg.Router
 			if handlerFunc := a.Handlers[router]; handlerFunc != nil {

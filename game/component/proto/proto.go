@@ -34,3 +34,35 @@ const (
 	HongZhong            = 5
 	DouGongNiu           = 8
 )
+
+type RoomMessageType int
+
+const (
+	UserReadyNotify             RoomMessageType = 301 // 用户准备的通知
+	UserReadyPush                               = 401 // 用户准备的推送
+	UserLeaveRoomNotify                         = 303 // 用户离开房间的通知
+	UserLeaveRoomResponse                       = 403 //用户离开房间的回复
+	UserLeaveRoomPush                           = 404 //用户离开房间的推送
+	OtherUserEntryRoomPush                      = 402 // 用户进入房间的推送
+	DismissPush                                 = 405 //房间解散的推送
+	UserInfoChangePush                          = 406 //房间用户信息变化的推送
+	UserChatNotify                              = 307 // 用户聊天通知
+	UserChatPush                                = 407 // 用户聊天推送
+	UserOffLinePush                             = 408 //用户掉线的推送
+	DrawFinishedPush                            = 409 //开设的房间局数用完推送
+	UserReconnectNotify                         = 312 //玩家断线重连
+	UserReconnectPush                           = 412 //
+	AskForDismissNotify                         = 313 //玩家请求解散房间
+	AskForDismissPush                           = 413 //
+	EndPush                                     = 414 //最终结果推送
+	AskForDismissStatusNotify                   = 316
+	AskForDismissStatusPush                     = 416
+	GetRoomShowUserInfoNotify                   = 317 // 获取房间需要显示的玩家信息通知
+	GetRoomShowUserInfoPush                     = 417 // 获取房间需要显示的玩家信息推送
+	GetRoomSceneInfoNotify                      = 318 // 获取房间场景信息的通知
+	GetRoomSceneInfoPush                        = 418 // 获取房间场景信息的推送
+	GetRoomOnlineUserInfoNotify                 = 319 // 获取房间在线用户信息的通知
+	GetRoomOnlineUserInfoPush                   = 419
+	UserChangeSeatNotify                        = 320 //换座通知
+	UserChangeSeatPush                          = 420
+)

@@ -2,6 +2,7 @@ package logic
 
 import (
 	"fmt"
+	"game/component/room"
 	"golang.org/x/exp/rand"
 	"sync"
 	"time"
@@ -18,9 +19,12 @@ type UnionManager struct {
 
 func NewUnionManager() *UnionManager {
 	list := make(map[int64]*Union)
-	return &UnionManager{
+	u := &UnionManager{
 		unionList: list,
 	}
+	// 创建默认为 1 的联盟
+	u.CreateUnionById(1)
+	return u
 }
 
 func (m *UnionManager) GetUnion(id int64) *Union {
@@ -68,4 +72,14 @@ func (m *UnionManager) genRoomId() string {
 	// 房间号6位数
 	roomIdInt := rand.Int63n(899999) + 10000
 	return fmt.Sprintf("%d", roomIdInt)
+}
+
+func (m *UnionManager) GetRoomById(s string) *room.Room {
+	for _, v := range m.unionList {
+		r, ok := v.RoomList[s]
+		if ok {
+			return r
+		}
+	}
+	return nil
 }

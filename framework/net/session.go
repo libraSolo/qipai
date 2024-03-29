@@ -12,6 +12,7 @@ type Session struct {
 func NewSession(cid string) *Session {
 	return &Session{
 		ClientId: cid,
+		data:     make(map[string]any),
 	}
 }
 
