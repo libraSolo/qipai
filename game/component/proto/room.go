@@ -1,7 +1,5 @@
 package proto
 
-import "core/models/entity"
-
 type RoomCreator struct {
 	Uid         string     `json:"uid"`
 	CreatorType CreateType `json:"creatorType"`
@@ -33,8 +31,8 @@ type UserInfo struct {
 type UserStatus int
 
 const (
-	None UserStatus = 1 << iota
-	Ready
+	None  UserStatus = 0
+	Ready UserStatus = 1 << (iota - 1)
 	Playing
 	Offline
 	Dismiss
@@ -44,18 +42,4 @@ type RoomUser struct {
 	UserInfo   UserInfo   `json:"userInfo"`
 	ChairId    int        `json:"chairID"`
 	UserStatus UserStatus `json:"userStatus"`
-}
-
-func ToRoomUser(user *entity.User) *UserInfo {
-	return &UserInfo{
-		Uid:         user.Uid,
-		Nickname:    user.Nickname,
-		Avatar:      user.Avatar,
-		Address:     user.Address,
-		Location:    user.Location,
-		LastLoginIP: user.LastLoginIp,
-		Gold:        user.Gold,
-		Sex:         user.Sex,
-		FrontendId:  user.FrontendId,
-	}
 }
