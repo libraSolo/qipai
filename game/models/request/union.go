@@ -7,3 +7,7 @@ type CreateRoomReq struct {
 	GameRuleID string         `json:"gameRuleID"`
 	GameRule   proto.GameRule `json:"gameRule"`
 }
+
+type JoinRoomReq struct {
+	RoomID string `json:"roomID"`
+}

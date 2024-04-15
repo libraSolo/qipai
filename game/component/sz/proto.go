@@ -3,14 +3,14 @@ package sz
 type GameStatus int
 
 type GameData struct {
-	BankerChairID   int                      `json:"bankerChairID"`
+	BankerChairID   int                      `json:"bankerChairID"` // 庄家
 	ChairCount      int                      `json:"chairCount"`
-	CurBureau       int                      `json:"curBureau"`
-	CurScore        int                      `json:"curScore"`
+	CurBureau       int                      `json:"curBureau"` // 局数
+	CurScore        int                      `json:"curScore"`  // 当前分数
 	CurScores       []int                    `json:"curScores"`
 	GameStarter     bool                     `json:"gameStarter"`
 	GameStatus      GameStatus               `json:"gameStatus"`
-	HandCards       [][]int                  `json:"handCards"`
+	HandCards       [][]int                  `json:"handCards"` // 手牌
 	LookCards       []int                    `json:"lookCards"`
 	Loser           []int                    `json:"loser"`
 	MaxBureau       int                      `json:"maxBureau"`
@@ -27,6 +27,31 @@ type GameData struct {
 	TrustTmArray    []int                    `json:"trustTmArray"`
 	CurChairID      int                      `json:"curChairID"`
 }
+
+const (
+	GameStatusPush      = 401 //游戏状态推送
+	GameSendCardsPush   = 402 //发牌推送
+	GameLookNotify      = 303 //看牌请求
+	GameLookPush        = 403
+	GamePourScoreNotify = 304 //下分请求
+	GamePourScorePush   = 404
+	GameCompareNotify   = 305 //比牌请求
+	GameComparePush     = 405
+	GameTurnPush        = 406 //操作推送
+	GameResultPush      = 407 //结果推送
+	GameEndPush         = 409 //结束推送
+	GameChatNotify      = 310 //游戏聊天
+	GameChatPush        = 410
+	GameBureauPush      = 411 //局数推送
+	GameAbandonNotify   = 312 //弃牌请求
+	GameAbandonPush     = 412
+	GameRoundPush       = 413 //轮数推送
+	GameBankerPush      = 414 //庄家推送
+	GameTrustNotify     = 315 //托管
+	GameTrustPush       = 415 //托管推送
+	GameReviewNotify    = 316 //牌面回顾
+	GameReviewPush      = 416
+)
 
 // None 初始状态
 const None int = 0

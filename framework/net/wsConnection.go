@@ -18,12 +18,13 @@ var (
 )
 
 type WsConnection struct {
-	ClientId  string
-	Conn      *websocket.Conn
-	manager   *Manager
-	ReadChan  chan *MsgPack
-	WriteChan chan []byte
-	Session   *Session
+	ClientId   string
+	Conn       *websocket.Conn
+	manager    *Manager
+	ReadChan   chan *MsgPack
+	WriteChan  chan []byte
+	Session    *Session
+	pingTicker *time.Ticker
 }
 
 func NewWsConnection(conn *websocket.Conn, manager *Manager) *WsConnection {
@@ -75,16 +76,18 @@ func (c *WsConnection) readMessage() {
 }
 
 func (c *WsConnection) writeMessage() {
-	ticker := time.NewTicker(pingInterval)
+
+	c.pingTicker = time.NewTicker(pingInterval)
 	for {
 		select {
-		case <-ticker.C:
+		case <-c.pingTicker.C:
 			if err := c.Conn.SetWriteDeadline(time.Now().Add(writeWait)); err != nil {
 				logs.Error("client[%s] ping dead line error :%v", c.ClientId, err)
 
 			}
 			if err := c.Conn.WriteMessage(websocket.PingMessage, nil); err != nil {
 				logs.Error("client[%s] ping error :%v", c.ClientId, err)
+				c.Close()
 			}
 		case message, ok := <-c.WriteChan:
 			if !ok {
@@ -104,6 +107,9 @@ func (c *WsConnection) writeMessage() {
 func (c *WsConnection) Close() {
 	if c.Conn != nil {
 		c.Conn.Close()
+	}
+	if c.pingTicker != nil {
+		c.pingTicker.Stop()
 	}
 }
 

@@ -3,6 +3,7 @@ package logic
 import (
 	"core/models/entity"
 	"core/service"
+	"framework/errorCode"
 	"framework/remote"
 	"game/component/room"
 	"game/models/request"
@@ -23,7 +24,7 @@ func NewUnion(m *UnionManager) *Union {
 	}
 }
 
-func (u *Union) CreateRoom(service *service.UserService, session *remote.Session, req request.CreateRoomReq, user *entity.User) error {
+func (u *Union) CreateRoom(service *service.UserService, session *remote.Session, req request.CreateRoomReq, user *entity.User) *errorCode.Error {
 	// 创建一个房间 生成一个房间号
 	id := u.manager.CreateRoomId()
 	newRoom := room.NewRoom(id, req.UnionID, req.GameRule, u)
