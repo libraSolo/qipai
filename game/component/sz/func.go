@@ -88,3 +88,15 @@ func GameTurnPushData(chairID, score int) any {
 		"pushRouter": "GameMessagePush",
 	}
 }
+
+func GameLookPushData(chairID int, cards []int, cuoPai bool) any {
+	return map[string]any{
+		"type": GameLookPush,
+		"data": map[string]any{
+			"cards":   cards,
+			"chairID": chairID,
+			"cuopai":  cuoPai,
+		},
+		"pushRouter": "GameMessagePush",
+	}
+}

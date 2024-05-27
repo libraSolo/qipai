@@ -1,5 +1,13 @@
 package sz
 
+type MessageData struct {
+	Cuopai bool `json:"cuopai"`
+}
+
+type MessageReq struct {
+	Type int         `json:"type"`
+	Data MessageData `json:"data"`
+}
 type GameStatus int
 
 type GameData struct {

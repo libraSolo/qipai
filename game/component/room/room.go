@@ -285,3 +285,16 @@ func (r *Room) startGame(session *remote.Session, user *proto.RoomUser) {
 func (r *Room) GetUsers() map[string]*proto.RoomUser {
 	return r.users
 }
+
+func (r *Room) GetID() string {
+	return r.Id
+}
+
+func (r *Room) GameMessageHandle(session *remote.Session, msg []byte) {
+	// 游戏处理消息
+	user, ok := r.users[session.GetUid()]
+	if !ok {
+		return
+	}
+	r.GameFrame.GameMessageHandle(user, session, msg)
+}
