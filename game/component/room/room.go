@@ -117,7 +117,7 @@ func (r *Room) getRoomSceneInfoPush(session *remote.Session) {
 			"roomCreatorInfo": r.RoomCreator,
 			"gameRule":        r.gameRule,
 			"roomUserInfoArr": userInfoArr,
-			"gameData":        r.GameFrame.GetGameData(),
+			"gameData":        r.GameFrame.GetGameData(session),
 		},
 	}
 	session.Push([]string{session.GetUid()}, data, "ServerMessagePush")

@@ -7,6 +7,7 @@ import (
 	"framework/remote"
 	"game/component/base"
 	"game/component/proto"
+	"github.com/jinzhu/copier"
 )
 
 type GameFrame struct {
@@ -41,8 +42,28 @@ func (g *GameFrame) ServerMessagePush(session *remote.Session, users []string, d
 	session.Push(users, data, "ServerMessagePush")
 }
 
-func (g *GameFrame) GetGameData() any {
-	return g.gameData
+func (g *GameFrame) GetGameData(session *remote.Session) any {
+	// 获取当前用户
+	user := g.r.GetUsers()[session.GetUid()]
+	// 判断当前用户是否已经看牌
+	// 已经看牌则返回, 否则为隐藏
+	var gameData GameData
+	_ = copier.CopyWithOption(&gameData, g.gameData, copier.Option{DeepCopy: true})
+	for i := 0; i < g.gameData.ChairCount; i++ {
+		if g.gameData.HandCards[i] != nil {
+			// 隐藏
+			gameData.HandCards[i] = make([]int, 3)
+		} else {
+			// 没有玩的人
+			gameData.HandCards[i] = nil
+		}
+	}
+	if g.gameData.LookCards[user.ChairId] == 1 {
+		// 已经看牌
+		gameData.HandCards[user.ChairId] = g.gameData.HandCards[user.ChairId]
+	}
+
+	return gameData
 }
 
 func (g *GameFrame) StartGame(session *remote.Session, user *proto.RoomUser) {
