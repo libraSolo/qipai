@@ -2,6 +2,8 @@ package sz
 
 type MessageData struct {
 	Cuopai bool `json:"cuopai"`
+	Score  int  `json:"score"`
+	Type   int  `json:"type"` // 1:跟注 2:加注
 }
 
 type MessageReq struct {

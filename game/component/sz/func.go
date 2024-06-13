@@ -54,7 +54,7 @@ func GameSendCardsPushData(handCards [][]int) any {
 }
 
 // GamePourScorePushData 座次, 玩家拥有分数, 当前座次所下分数, 所有用户下的分数,
-func GamePourScorePushData(chairID, score, chairScore, scores int) any {
+func GamePourScorePushData(chairID, score, chairScore, scores, t int) any {
 	return map[string]any{
 		"type": GamePourScorePush,
 		"data": map[string]any{
@@ -62,7 +62,7 @@ func GamePourScorePushData(chairID, score, chairScore, scores int) any {
 			"score":      score,
 			"chairScore": chairScore,
 			"scores":     scores,
-			"type":       0,
+			"type":       t,
 		},
 		"pushRouter": "GameMessagePush",
 	}
