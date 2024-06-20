@@ -53,6 +53,8 @@ func (g *GameFrame) GameMessageHandle(user *proto.RoomUser, session *remote.Sess
 		g.onGamePourScore(user, session, req.Data.Score, req.Data.Type)
 	case GameCompareNotify:
 		g.onGameCompare(user, session, req.Data.ChairID)
+	case GameAbandonNotify:
+		g.onGameAbandon(user, session)
 	default:
 		logs.Info("没有匹配的操作类型 %d", req.Type)
 	}
@@ -389,5 +391,30 @@ func (g *GameFrame) gameEnd(session *remote.Session) {
 		for _, user := range g.r.GetUsers() {
 			g.r.UserReady(session, user.UserInfo.Uid)
 		}
+	})
+}
+
+func (g *GameFrame) onGameAbandon(user *proto.RoomUser, session *remote.Session) {
+	if !g.IsPlayingChairID(user.ChairId) {
+		return
+	}
+	if utils.Contains(g.gameData.Loser, user.ChairId) {
+		return
+	}
+	g.gameData.Loser = append(g.gameData.Loser, user.ChairId)
+	for i := 0; i < g.gameData.ChairCount; i++ {
+		if g.IsPlayingChairID(i) && i != user.ChairId {
+			g.gameData.Winner = append(g.gameData.Winner, i)
+		}
+	}
+
+	g.gameData.UserStatusArray[user.ChairId] = Abandon
+
+	// 推送弃牌
+	g.ServerMessagePush(session, g.getAllUsers(), GameAbandonPushData(user.ChairId, g.gameData.UserStatusArray[user.ChairId]))
+
+	// 一秒后推送其他
+	time.AfterFunc(time.Second, func() {
+		g.endPourScore(session)
 	})
 }

@@ -68,6 +68,7 @@ func GamePourScorePushData(chairID, score, chairScore, scores, t int) any {
 	}
 }
 
+// GameRoundPushData 轮次推送
 func GameRoundPushData(round int) any {
 	return map[string]any{
 		"type": GameRoundPush,
@@ -78,6 +79,7 @@ func GameRoundPushData(round int) any {
 	}
 }
 
+// GameTurnPushData 操作
 func GameTurnPushData(chairID, score int) any {
 	return map[string]any{
 		"type": GameTurnPush,
@@ -89,6 +91,7 @@ func GameTurnPushData(chairID, score int) any {
 	}
 }
 
+// GameLookPushData 看牌
 func GameLookPushData(chairID int, cards []int, cuoPai bool) any {
 	return map[string]any{
 		"type": GameLookPush,
@@ -101,6 +104,7 @@ func GameLookPushData(chairID int, cards []int, cuoPai bool) any {
 	}
 }
 
+// GameComparePushData 比牌
 func GameComparePushData(curChairID, otherChairID, winChairID, loseChairID int) any {
 	return map[string]any{
 		"type": GameComparePush,
@@ -114,11 +118,24 @@ func GameComparePushData(curChairID, otherChairID, winChairID, loseChairID int) 
 	}
 }
 
+// GameResultPushData 結果
 func GameResultPushData(result *GameResult) any {
 	return map[string]any{
 		"type": GameResultPush,
 		"data": map[string]any{
 			"result": result,
+		},
+		"pushRouter": "GameMessagePush",
+	}
+}
+
+// GameAbandonPushData 弃牌
+func GameAbandonPushData(chairID int, userStatus UserStatus) any {
+	return map[string]any{
+		"type": GameAbandonPush,
+		"data": map[string]any{
+			"chairID":    chairID,
+			"userStatus": userStatus,
 		},
 		"pushRouter": "GameMessagePush",
 	}
