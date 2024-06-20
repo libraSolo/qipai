@@ -1,9 +1,10 @@
 package sz
 
 type MessageData struct {
-	Cuopai bool `json:"cuopai"`
-	Score  int  `json:"score"`
-	Type   int  `json:"type"` // 1:跟注 2:加注
+	Cuopai  bool `json:"cuopai"`
+	Score   int  `json:"score"`
+	Type    int  `json:"type"` // 1:跟注 2:加注
+	ChairID int  `json:"chairID"`
 }
 
 type MessageReq struct {
@@ -23,6 +24,7 @@ type GameData struct {
 	HandCards       [][]int                  `json:"handCards"` // 手牌
 	LookCards       []int                    `json:"lookCards"`
 	Loser           []int                    `json:"loser"`
+	Winner          []int                    `json:"winner"`
 	MaxBureau       int                      `json:"maxBureau"`
 	PourScores      [][]int                  `json:"pourScores"`
 	GameType        GameType                 `json:"gameType"`
@@ -101,9 +103,9 @@ const (
 	DanZhang CardsType = 1 //单牌
 	DuiZi              = 2 //对子
 	ShunZi             = 3 //顺子
-	JinHua             = 3 //金花
-	ShunJin            = 3 //顺金
-	BaoZi              = 3 //豹子
+	JinHua             = 4 //金花
+	ShunJin            = 5 //顺金
+	BaoZi              = 6 //豹子
 )
 
 type UserStatus int
@@ -133,4 +135,12 @@ type BureauReview struct {
 	Avatar    string `json:"avatar"`
 	IsBanker  bool   `json:"isBanker"`
 	IsAbandon bool   `json:"isAbandon"`
+}
+
+type GameResult struct {
+	Winners   []int   `json:"winners"`
+	WinScores []int   `json:"winScores"`
+	HandCards [][]int `json:"handCards"`
+	CurScores []int   `json:"curScores"`
+	Losers    []int   `bson:"losers"`
 }

@@ -27,6 +27,17 @@ type Room struct {
 	gameStarted   bool
 }
 
+func (r *Room) UserReady(session *remote.Session, uid string) {
+	r.userReady(session, uid)
+}
+
+func (r *Room) EndGame(session *remote.Session) {
+	r.gameStarted = false
+	for k := range r.users {
+		r.users[k].UserStatus = proto.None
+	}
+}
+
 func NewRoom(id string, unionID int64, rule proto.GameRule, u base.UnionBase) *Room {
 	room := &Room{
 		Id:            id,
@@ -97,7 +108,7 @@ func (r *Room) RoomMessageHandle(session *remote.Session, req request.RoomMessag
 	case proto.GetRoomSceneInfoNotify:
 		r.getRoomSceneInfoPush(session)
 	case proto.UserReadyNotify:
-		r.userReady(session, req)
+		r.userReady(session, session.GetUid())
 	default:
 		logs.Error("RoomMessageHandle type:%v", req.Type)
 	}
@@ -187,9 +198,8 @@ func (r *Room) cancelAllScheduler() {
 
 }
 
-func (r *Room) userReady(session *remote.Session, req request.RoomMessageReq) {
+func (r *Room) userReady(session *remote.Session, uid string) {
 	// push 座次
-	uid := session.GetUid()
 	user, ok := r.users[uid]
 	if !ok {
 		return

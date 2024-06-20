@@ -100,3 +100,26 @@ func GameLookPushData(chairID int, cards []int, cuoPai bool) any {
 		"pushRouter": "GameMessagePush",
 	}
 }
+
+func GameComparePushData(curChairID, otherChairID, winChairID, loseChairID int) any {
+	return map[string]any{
+		"type": GameComparePush,
+		"data": map[string]any{
+			"fromChairID": curChairID,
+			"toChairID":   otherChairID,
+			"winChairID":  winChairID,
+			"loseChairID": loseChairID,
+		},
+		"pushRouter": "GameMessagePush",
+	}
+}
+
+func GameResultPushData(result *GameResult) any {
+	return map[string]any{
+		"type": GameResultPush,
+		"data": map[string]any{
+			"result": result,
+		},
+		"pushRouter": "GameMessagePush",
+	}
+}
