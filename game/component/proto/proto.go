@@ -2,23 +2,27 @@ package proto
 
 type GameRule struct {
 	AddScores      []int `json:"addScores"`      //加注分
-	BaseScore      int   `json:"baseScore"`      //底分
-	Bureau         int   `json:"bureau"`         //局数
-	CanEnter       bool  `json:"canEnter"`       //中途进人
-	CanTrust       bool  `json:"canTrust"`       //允许托管
+	BaseScore      int   `json:"baseScore"`      //底分 sz hz
+	Bureau         int   `json:"bureau"`         //局数 sz hz
+	CanEnter       bool  `json:"canEnter"`       //中途进人 sz hz
+	CanTrust       bool  `json:"canTrust"`       //允许托管 sz hz
+	Chunnainiu     bool  `json:"chunnainiu"`     //是否允许搓牛  hz
 	CanWatch       bool  `json:"canWatch"`       //允许观战
 	Cuopai         bool  `json:"cuopai"`         //高级 是否允许搓牌
-	Fangzuobi      bool  `json:"fangzuobi"`      //防作弊
-	Yuyin          bool  `json:"yuyin"`          //语音
-	GameFrameType  int   `json:"gameFrameType"`  //游戏模式
-	GameType       int   `json:"gameType"`       //游戏类型 牛牛 三公等
-	MaxPlayerCount int   `json:"maxPlayerCount"` //最大人数
-	MinPlayerCount int   `json:"minPlayerCount"` //最小人数
-	MaxScore       int   `json:"maxScore"`       //最大加注分
-	RoundType      int   `json:"roundType"`      //轮数
-	PayDiamond     int   `json:"payDiamond"`     //房费
-	PayType        int   `json:"payType"`        //支付方式 1 AA支付 2 赢家支付 3 我支付
-	RoomType       int   `json:"roomType"`       // 1 正常房间 2 持续房间 3 百人房间
+	GameFrameType  int   `json:"gameFrameType"`  //游戏模式  sz hz
+	GameType       int   `json:"gameType"`       //游戏类型 牛牛 三公等  sz hz
+	Ma             int   `json:"ma"`             //扎码 hz
+	MaxPlayerCount int   `json:"maxPlayerCount"` //最大人数 sz hz
+	MinPlayerCount int   `json:"minPlayerCount"` //最小人数 sz hz
+	PayDiamond     int   `json:"payDiamond"`     //房费 sz hz
+	PayType        int   `json:"payType"`        //支付方式 1 AA支付 2 赢家支付 3 我支付 sz hz
+	Qidui          bool  `json:"qidui"`          //七对 一种胡牌方式 hz
+	RoomType       int   `json:"roomType"`       // 1 正常房间 2 持续房间 3 百人房间 hz
+	Yuyin          bool  `json:"yuyin"`          //语音 sz hz
+	TrustTm        int   `json:"trustTm"`        //托管时长 hz
+	Fangzuobi      bool  `json:"fangzuobi"`      //防作弊 sz
+	MaxScore       int   `json:"maxScore"`       //最大加注分 sz
+	RoundType      int   `json:"roundType"`      //轮数 sz
 }
 
 type GameType int

@@ -6,6 +6,7 @@ import (
 	"framework/errorCode"
 	"framework/remote"
 	"game/component/base"
+	"game/component/mj"
 	"game/component/proto"
 	"game/component/sz"
 	"game/models/request"
@@ -49,6 +50,8 @@ func NewRoom(id string, unionID int64, rule proto.GameRule, u base.UnionBase) *R
 	}
 	if rule.GameType == int(proto.PinSanZhang) {
 		room.GameFrame = sz.NewGameFrame(room, rule)
+	} else if rule.GameType == int(proto.HongZhong) {
+		room.GameFrame = mj.NewGameFrame(room, rule)
 	}
 	return room
 }
